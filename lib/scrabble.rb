@@ -1,7 +1,42 @@
+require 'pry'
 class Scrabble
 
   def score(word)
-    1
+    value = 0
+    if word.class == String && word.length != 0
+      value += find_array_of_values(word).sum
+      value += 10 if word.length > 6
+    end
+    value
+  end
+
+  def find_array_of_values(word)
+    value_array = []
+    split_characters = word.split('')
+    split_characters.each do |character|
+      value_array << point_values[character.upcase]
+    end
+    value_array
+  end
+
+
+  def score_with_multipliers(word, letter_multipliers, word_multiplier = 1)
+    value_array = find_array_of_values(word)
+    letter_values_with_multipliers = value_array.zip(letter_multipliers)
+    total_letter_scores = letter_values_with_multipliers.map do |value|
+      value[0]*value[1]
+    end.sum
+    total_letter_scores += 10 if word.length > 6
+    total_letter_scores * word_multiplier
+  end
+
+  def highest_scoring_word(array)
+    array.sort_by! {|word| word.length}.reverse
+    scores = {}
+    array.map do |word|
+      scores[score(word)] = word
+    end
+    scores[scores.keys.max]
   end
 
   def point_values
